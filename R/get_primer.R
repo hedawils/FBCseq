@@ -9,7 +9,8 @@
 #' @export
 #'
 #' @example
-
+#' get_primer("CCAGATGTCGGCATTATTAGGCCATCTTCTGGCACAGAAATAGGTGGCCGTGTCCGAGGCTGTCAGACTGTTCATTTTCAGATCCATCGTGGTCGAGGTTTTGGA", annealing = 62)
+#' ### "CCAGATGTCGGCATTATTAGGCCATCTTCT"
 
 get_primer <- function(sequence, annealing = 62){
   success <- FALSE
