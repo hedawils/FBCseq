@@ -7,8 +7,7 @@
 #' @export
 #'
 #' @examples tm_calc("GCCCTTGGTGGAGGC")
-#' 
-#' #### 46.15714
+#' 46.15714
 
 
 
