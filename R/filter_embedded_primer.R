@@ -1,6 +1,7 @@
-#' Calculate depmap score mean for depmap cell lines, and N per gene
+#' Filter embedded CH1 primer from reads
 #'
-#'For a subset of cell lines
+#' Identify reads containing correct reverse primer, filter them, then trim reads
+#' such that HCDR3 is in correct reading frame
 #'
 #' @param seq sequence
 #' @param read_length Miseq read length - default = 250
@@ -9,7 +10,7 @@
 #'
 #' @export
 #'
-#' @example
+
 
 
 

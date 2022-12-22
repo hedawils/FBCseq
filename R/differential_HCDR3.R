@@ -1,7 +1,7 @@
 #' Calculate depmap score mean for depmap cell lines, and N per gene
 #'
 #' Function to conduct differential HCDR3 abundance analysis of single end MiSeq reads
-#' from FBCseq experiment
+#' from FBCseq whole cell phage selections
 #'
 #' @param experimental_fastq_files vector of names of experimental fastq files for analysis. Ordered to be paired with control_fastq_files
 #' @param control_fastq_files vector of names of control fastq files for analysis. Ordered to be paired with experimental_fastq_files
@@ -10,14 +10,15 @@
 #'
 #' @export
 #'
-#' @example results <- differential_HCDR3(experimental_fastq_files = c(), control_fastq_files = c(), primer = "GCCCTTGGTGGAGGC")
+#' @examples results <- differential_HCDR3(experimental_fastq_files = c(), control_fastq_files = c(), primer = "GCCCTTGGTGGAGGC")
 #' ### download example fastqs from ENA
 #' 
 #' 
 
 
 
-differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files, primer = "GCCCTTGGTGGAGGC"){
+differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files, 
+                               primer = "GCCCTTGGTGGAGGC"){
   
   library(tidyverse)
   library(magrittr)
@@ -42,17 +43,23 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files, pr
     DNA <- filter_embedded_primer(DNA, primer)
     aa <- Biostrings::translate(Biostrings::DNAStringSet(DNA), if.fuzzy.codon = "X")
     HCDR3 <- extract_HCDR3s(aa)
-    HCDR3_libs[[i]] <- as.data.frame(table(HCDR3)) %>% dplyr::mutate_at(vars(HCDR3), as.character)
-    names(HCDR3_libs[[i]])[2] <- paste0("Count_", library_names[i]) %>% stringr::str_remove_all(".fastq|.fastq.gz")
+    HCDR3_libs[[i]] <- as.data.frame(table(HCDR3)) %>% 
+      dplyr::mutate_at(vars(HCDR3), as.character)
+    names(HCDR3_libs[[i]])[2] <- paste0("Count_", library_names[i]) %>% 
+                                    stringr::str_remove_all(".fastq|.fastq.gz")
     HCDR3s[[i]] <- HCDR3_libs[[i]]$HCDR3
-    DNA_libs[[i]] <- as.data.frame(table(DNA)) %>%dplyr:: mutate_at(vars(DNA), as.character)
+    DNA_libs[[i]] <- as.data.frame(table(DNA)) %>% 
+      dplyr::mutate_at(vars(DNA), as.character)
     
-    names(DNA_libs[[i]])[2] <- paste0("Count_", library_names[i]) %>% stringr::str_remove_all(".fastq|.fastq.gz")
+    names(DNA_libs[[i]])[2] <- paste0("Count_", library_names[i]) %>% 
+                                    stringr::str_remove_all(".fastq|.fastq.gz")
     
     if ((i == 1) | (i == length(experimental_fastq_files) + 1)) {
-      DNA_libs[[i]]$AA <- DNAStringSet(DNA_libs[[i]]$DNA) %>% translate(if.fuzzy.codon = "X") %>% as.character()
-      DNA_libs[[i]]$HCDR3 <- sapply(strsplit(sapply(strsplit(as.character(DNA_libs[[i]]$AA), "WG.G"), "[", 1), 
-                                             ".TYFC|A.YFC|AT.FC|ATY.C"), "[", 2)
+      DNA_libs[[i]]$AA <- Biostrings::DNAStringSet(DNA_libs[[i]]$DNA) %>% 
+        Biostrings::translate(if.fuzzy.codon = "X") %>% as.character()
+      DNA_libs[[i]]$HCDR3 <- sapply(strsplit(sapply(strsplit(
+          as.character(DNA_libs[[i]]$AA), "WG.G"), "[", 1), 
+              ".TYFC|A.YFC|AT.FC|ATY.C"), "[", 2)
       names(DNA_libs[[i]])[2] <- "counts"
     }
     
@@ -98,18 +105,20 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files, pr
   #Append results df with HCDR3 and mean abundance in target and non-target outputs
   results$HCDR3 <- as.character(row.names(matrix))
   results$mean_non_targ_normalized <- rowMeans(as.matrix(counts(dds,
-                                                                normalized=TRUE))[,which(as.vector(substrate) == "non.target")])
+              normalized=TRUE))[,which(as.vector(substrate) == "non.target")])
   results$mean_targ_normalized <- rowMeans(as.matrix(counts(dds,
-                                                            normalized=TRUE))[,which(as.vector(substrate) == "target")])
+              normalized=TRUE))[,which(as.vector(substrate) == "target")])
   
-  results$mean_non_targ_normalized <- results$mean_non_targ_normalized/sum(results$mean_non_targ_normalized)
-  results$mean_targ_normalized <- results$mean_targ_normalized/sum(results$mean_targ_normalized)
+  results$mean_non_targ_normalized <- results$mean_non_targ_normalized/
+                                      sum(results$mean_non_targ_normalized)
+  results$mean_targ_normalized <- results$mean_targ_normalized/
+                                  sum(results$mean_targ_normalized)
   
   #Order results by pvalue
   results_ordered <- as.data.frame(results[order(-results$baseMean),])
   
   #Extract DNA sequences from DNA_libs
-  DNA_data <-rbind(DNA_libs[[1]], DNA_libs[[length(experimental_fastq_files) + 1]])
+  DNA_data <- rbind(DNA_libs[[1]], DNA_libs[[length(experimental_fastq_files) + 1]])
   DNA_data <- DNA_data %>% arrange(desc(counts))
   
   results_ordered$DNA_sequence <- DNA_data$DNA[match(results_ordered$HCDR3, DNA_data$HCDR3)]
