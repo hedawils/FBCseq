@@ -57,9 +57,7 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
     if ((i == 1) | (i == length(experimental_fastq_files) + 1)) {
       DNA_libs[[i]]$AA <- Biostrings::DNAStringSet(DNA_libs[[i]]$DNA) %>% 
         Biostrings::translate(if.fuzzy.codon = "X") %>% as.character()
-      DNA_libs[[i]]$HCDR3 <- sapply(strsplit(sapply(strsplit(
-          as.character(DNA_libs[[i]]$AA), "WG.G"), "[", 1), 
-              ".TYFC|A.YFC|AT.FC|ATY.C"), "[", 2)
+      DNA_libs[[i]]$HCDR3 <- splice_rabbit_HCDR3s(DNA_libs[[i]]$AA)
       names(DNA_libs[[i]])[2] <- "counts"
     }
     
