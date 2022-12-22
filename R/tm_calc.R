@@ -1,12 +1,14 @@
 #' Calculate tm of DNA oligo sequence
 #'
 #'
-#' @param sequence primer sequence
+#' @param sequence primer sequence, as string
 #'
 #'
 #' @export
 #'
 #' @example
+#' tm_calc("GCCCTTGGTGGAGGC")
+#' #### 46.15714
 
 
 

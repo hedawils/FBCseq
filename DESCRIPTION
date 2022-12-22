@@ -1,0 +1,13 @@
+Package: FBCseq
+Type: Package
+Title: Differential HCDR3 abundance analysis
+Version: 0.1.0
+Author: Henry Wilson
+Maintainer: <Henry.wilson@gmail.com>
+Description: Analyses NGS outputs from FBCseq whole cell panning
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Imports:  tidyverse, magrittr, seqinr, R.utils, ShortRead, Biostrings, DESeq2
+Depends: 
+RoxygenNote: 7.2.1
