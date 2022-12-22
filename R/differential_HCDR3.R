@@ -10,9 +10,9 @@
 #'
 #' @export
 #'
-#' @example
+#' @example results <- differential_HCDR3(experimental_fastq_files = c(), control_fastq_files = c(), primer = "GCCCTTGGTGGAGGC")
 #' ### download example fastqs from ENA
-#' results <- differential_HCDR3(experimental_fastq_files = c(), control_fastq_files = c(), primer = "GCCCTTGGTGGAGGC")
+#' 
 #' 
 
 

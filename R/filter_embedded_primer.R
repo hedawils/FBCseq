@@ -14,6 +14,7 @@
 
 
 filter_embedded_primer <- function(DNA, primer) {
+  library(Biostrings)
   read_length <- nchar(DNA[1] %>% as.character)
   primer_pattern <- paste0(primer, "|", primer %>% DNAString %>% reverseComplement %>% as.character)
   ### filter sequences that have primer sequence (either orientation) at 3' end

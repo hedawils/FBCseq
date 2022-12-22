@@ -14,3 +14,8 @@ get_primer(sequence, annealing = 62)
 \description{
 Trims reverse complemented HCDR3 DNA sequence to appropriate primer length, based upon annealing temperature calculation
 }
+\examples{
+get_primer("CCAGATGTCGGCATTATTAGGCCATCTTCTGGCACAGAAATAGGTGGCCGTGTCCGAGGCTGTCAGACTGTTCATTTTCAGATCCATCGTGGTCGAGGTTTTGGA", annealing = 62)
+
+### "CCAGATGTCGGCATTATTAGGCCATCTTCT"
+}

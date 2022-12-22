@@ -7,8 +7,13 @@
 tm_calc(sequence)
 }
 \arguments{
-\item{sequence}{primer sequence}
+\item{sequence}{primer sequence, as string}
 }
 \description{
 Calculate tm of DNA oligo sequence
+}
+\examples{
+tm_calc("GCCCTTGGTGGAGGC")
+
+#### 46.15714
 }
