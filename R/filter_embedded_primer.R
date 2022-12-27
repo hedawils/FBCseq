@@ -4,7 +4,7 @@
 #' such that HCDR3 is in correct reading frame
 #'
 #' @param seq sequence
-#' @param read_length Miseq read length - default = 250
+#' @param read_length read length of single end read
 #' @param primer sequence of reverse primer
 #' 
 #'

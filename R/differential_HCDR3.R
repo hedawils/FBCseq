@@ -6,7 +6,7 @@
 #' @param experimental_fastq_files vector of names of experimental fastq files for analysis. Ordered to be paired with control_fastq_files
 #' @param control_fastq_files vector of names of control fastq files for analysis. Ordered to be paired with experimental_fastq_files
 #' @param primer CH1 hybridizing reverse primer. 
-#'
+#' @param split_pattern DNA sequence used for sequence trimming and primer design. Forward primer hybridizes in FW4, reverse in HCDR3. Split point at protein sequence XXXXXXW^GPCTLVTVSS
 #'
 #' @export
 #'
@@ -18,7 +18,7 @@
 
 
 differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files, 
-                               primer = "GCCCTTGGTGGAGGC"){
+                               primer = "GCCCTTGGTGGAGGC", split_pattern = "GGCCCAGG|GGCCAGGG"){
   
   library(tidyverse)
   library(magrittr)
@@ -44,7 +44,7 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
     if (i == 1){
       ### detect split point for recovery primers - forward primer hybridizes in
       ### FW4, reverse in HCDR3. Split point at XXXXXXW^GPCTLVTVSS
-      split_point <- strsplit(as.character(DNA), "GGCCCAGG|GGCCAGGG") %>% 
+      split_point <- strsplit(as.character(DNA), split_pattern) %>% 
         sapply(`[`, 1) %>% nchar %>% table %>% which.max %>% names %>% as.numeric
       read_length <- nchar(DNA %>% as.character) %>% table %>% which.max %>% names %>% as.numeric
     }
