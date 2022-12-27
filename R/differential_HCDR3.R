@@ -12,8 +12,8 @@
 #'
 #' @examples results <- differential_HCDR3(experimental_fastq_files = c(), control_fastq_files = c(), primer = "GCCCTTGGTGGAGGC")
 #' ### download example fastqs from ENA
-#' 
-#' 
+#' U266_results <- differential_HCDR3(c("314_4_1.fastq", "314_5_1.fastq", "314_6_1.fastq"), c("314_7_1.fastq", "314_8_1.fastq", "314_9_1.fastq"), primer = "GCCCTTGGTGGAGGC")
+#' H929_results <- differential_HCDR3(c("314_1_1.fastq", "314_2_1.fastq", "314_3_1.fastq"), c("314_7_1.fastq", "314_8_1.fastq", "314_9_1.fastq"), primer = "GCCCTTGGTGGAGGC")
 
 
 
@@ -39,8 +39,23 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
   HCDR3s <- list()
   
   for (i in 1:length(library_names)){
-    DNA <- Biostrings::reverseComplement(ShortRead::sread(ShortRead::readFastq(library_names[i])))
-    DNA <- filter_embedded_primer(DNA, primer)
+    DNA <- library_names[i] %>% readFastq %>% sread %>% reverseComplement
+    
+    if (i == 1){
+      ### detect split point for recovery primers - forward primer hybridizes in
+      ### FW4, reverse in HCDR3. Split point at XXXXXXW^GPCTLVTVSS
+      split_point <- strsplit(as.character(DNA), "GGCCCAGG|GGCCAGGG") %>% 
+        sapply(`[`, 1) %>% nchar %>% table %>% which.max %>% names %>% as.numeric
+      read_length <- nchar(DNA %>% as.character) %>% table %>% which.max %>% names %>% as.numeric
+    }
+    
+    ## filter reads with correct primer sequence
+    DNA <- filter_embedded_primer(DNA, primer, read_length)
+    
+    # trim DNA from 5' end such that translated sequence is in frame
+    DNA <- substr(DNA, 1 + split_point %% 3, read_length)
+    
+    
     aa <- Biostrings::translate(Biostrings::DNAStringSet(DNA), if.fuzzy.codon = "X")
     HCDR3 <- extract_HCDR3s(aa)
     HCDR3_libs[[i]] <- as.data.frame(table(HCDR3)) %>% 
@@ -59,14 +74,22 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
         Biostrings::translate(if.fuzzy.codon = "X") %>% as.character()
       DNA_libs[[i]]$HCDR3 <- splice_rabbit_HCDR3s(DNA_libs[[i]]$AA)
       names(DNA_libs[[i]])[2] <- "counts"
+      
+      DNA_libs[[i]]$F_primer_template <- DNA_libs[[i]]$DNA %>% 
+        substr(split_point - (split_point %% 3) + 1, read_length)
+      
+      DNA_libs[[i]]$R_primer_template <- DNA_libs[[i]]$DNA %>% 
+        substr(1, split_point - (split_point %% 3)) %>% DNAStringSet %>% 
+        reverseComplement %>% as.character
+      
     }
     
     
   }
  
   ### obtain control matrix - keep sequences common to either all experimental or control outputs
-  control_HCDR3s <- Reduce(intersect, HCDR3s[1:length(control_fastq_files)])
-  experimental_HCDR3s <- Reduce(intersect, HCDR3s[(1+length(control_fastq_files)):length(HCDR3s)])
+  control_HCDR3s <- Reduce(intersect, HCDR3s[1:length(experimental_fastq_files)])
+  experimental_HCDR3s <- Reduce(intersect, HCDR3s[(1+length(experimental_fastq_files)):length(HCDR3s)])
   
   unique_HCDR3s <- c(control_HCDR3s, experimental_HCDR3s) %>% unique
   unique_HCDR3s <- unique_HCDR3s[nchar(unique_HCDR3s) > 1]
@@ -76,7 +99,7 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
     HCDR3_libs[[i]] <- HCDR3_libs[[i]][HCDR3_libs[[i]]$HCDR3 %in% unique_HCDR3s,]
   }
   
-  matrix <- HCDR3_libs %>% reduce(dplyr::full_join, by = "HCDR3") 
+  matrix <- HCDR3_libs %>% purrr::reduce(dplyr::full_join, by = "HCDR3") 
   row.names(matrix) <- matrix$HCDR3
   matrix$HCDR3 <- NULL
   matrix <- matrix[order(matrix %>% rowSums(na.rm=TRUE), decreasing = TRUE),]
@@ -118,24 +141,29 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
   #Extract DNA sequences from DNA_libs
   DNA_data <- rbind(DNA_libs[[1]], DNA_libs[[length(experimental_fastq_files) + 1]])
   DNA_data <- DNA_data %>% arrange(desc(counts))
+  DNA_data <- DNA_data[!duplicated(DNA_data$HCDR3),]
+  DNA_data <- DNA_data[!is.na(DNA_data$HCDR3),]
   
-  results_ordered$DNA_sequence <- DNA_data$DNA[match(results_ordered$HCDR3, DNA_data$HCDR3)]
+  DNA_data <- DNA_data[match(results_ordered$HCDR3, DNA_data$HCDR3),c("DNA", "F_primer_template", "R_primer_template") ]
+  
+  results_ordered <- cbind(results_ordered, DNA_data)
+  
+  #results_ordered$DNA_sequence <- DNA_data$DNA[match(results_ordered$HCDR3, DNA_data$HCDR3)]
 
-  read_length_no_primer <- results_ordered$DNA_sequence %>% nchar %>% unique
+  #read_length_no_primer <- results_ordered$DNA_sequence %>% nchar %>% unique
   
   ### forward primers start from second residue in FW4
-  results_ordered$FW4_primer <- results_ordered$DNA_sequence %>% 
-    substr(read_length_no_primer-29,read_length_no_primer-11)
+  #results_ordered$FW4_primer_template <- results_ordered$DNA_sequence %>% 
+  #  substr(read_length_no_primer-29,read_length_no_primer-11)
   
   ## reverse primer template to be trimmed to appropriate length after 
   ## subsetting of sequences for mAb recovery
-  results_ordered$primer_template <- results_ordered$DNA_sequence %>% 
-    substr(1,read_length_no_primer-30) %>% 
-    DNAStringSet %>% reverseComplement %>% as.character
+  #results_ordered$primer_template <- results_ordered$DNA_sequence %>% 
+    # substr(1,read_length_no_primer-30) %>% 
+    # DNAStringSet %>% reverseComplement %>% as.character
   
   
   return(results_ordered)
   
 }
-c
 
