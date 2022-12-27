@@ -2,10 +2,32 @@
 
 These functions enable differential abundance analysis of rabbit HCDR3 sequences, identified via the FBC-seq whole cell panning method.
 
-Package download via:
+Package download via devtools in R:
 ```
 library(devtools)
 install_github("hedawils/FBCseq")
 ```
 
-Reads should span the HCDR3, starting from the CH1 region
+Reads should span the HCDR3 in a reverse orientation, starting from CH1 or constant sequence immediately downstream of VH domain. 
+
+Repository includes function for primer design to enable around the horn PCR-based recovery of single clones.
+
+Published raw FASTQ files can be downloaded here: XXXXXX
+
+Pipeline for differential HCDR3 analysis and primer design:
+
+```
+## navigate to folder where files are located
+H929_results <- differential_HCDR3(c("314_1_1.fastq", "314_2_1.fastq", "314_3_1.fastq"), c("314_7_1.fastq", "314_8_1.fastq", "314_9_1.fastq"), primer = "GCCCTTGGTGGAGGC")
+
+## generate volcano plot
+H929_plot <- volcano_HCDR3s(H929_results, )
+
+## select sequences for recovery based upon 8-fold enriched, pvalue < 1e-4, and absolute abundance > 1e-4
+H929_primer_set <- H929_results[H929_results$mean_targ_normalized > 1e-4 & H929_results$pvalue < 1e-4 & H929_results$log2FoldChange > 3)
+H929_primer_set$F_primer <- sapply(H929_primer_set$F_primer_template, get_primer(annealing = 62))
+H929_primer_set$R_primer <- sapply(H929_primer_set$R_primer_template, get_primer(annealing = 62))
+```
+
+
+
