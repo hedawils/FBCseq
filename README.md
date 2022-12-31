@@ -14,7 +14,7 @@ Published raw FASTQ files from publication can be downloaded here: XXXXXX
 
 ---
 #Pipeline for differential HCDR3 analysis and primer design
----s
+---
 
 ```
 ## navigate to folder where files are located
