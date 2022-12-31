@@ -5,8 +5,10 @@
 #'
 #' @param experimental_fastq_files vector of names of experimental fastq files for analysis. Ordered to be paired with control_fastq_files
 #' @param control_fastq_files vector of names of control fastq files for analysis. Ordered to be paired with experimental_fastq_files
-#' @param primer CH1 hybridizing reverse primer. 
+#' @param primer CH1 hybridizing reverse primer used for NGS.
 #' @param split_pattern DNA sequence used for sequence trimming and primer design. Forward primer hybridizes in FW4, reverse in HCDR3. Split point at protein sequence XXXXXXW^GPCTLVTVSS
+#' @param upstream_junction protein sequence REGEX upstream of rabbit HCDR3
+#' @param downstream_junction protein sequence REGEX downstream of rabbit HCDR3
 #'
 #' @export
 #'
@@ -18,7 +20,8 @@
 
 
 differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files, 
-                               primer = "GCCCTTGGTGGAGGC", split_pattern = "GGCCCAGG|GGCCAGGG"){
+                               primer = "GCCCTTGGTGGAGGC", split_pattern = "GGCCCAGG|GGCCAGGG", 
+                               upstream_junction = ".TYFC|A.YFC|AT.FC|ATY.C", downstream_junction = "WG.G"){
   
   library(tidyverse)
   library(magrittr)
@@ -57,7 +60,7 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
     
     
     aa <- Biostrings::translate(Biostrings::DNAStringSet(DNA), if.fuzzy.codon = "X")
-    HCDR3 <- extract_HCDR3s(aa)
+    HCDR3 <- extract_HCDR3s(aa, upstream_junction, downstream_junction)
     HCDR3_libs[[i]] <- as.data.frame(table(HCDR3)) %>% 
       dplyr::mutate_at(vars(HCDR3), as.character)
     names(HCDR3_libs[[i]])[2] <- paste0("Count_", library_names[i]) %>% 
@@ -72,7 +75,7 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
     if ((i == 1) | (i == length(experimental_fastq_files) + 1)) {
       DNA_libs[[i]]$AA <- Biostrings::DNAStringSet(DNA_libs[[i]]$DNA) %>% 
         Biostrings::translate(if.fuzzy.codon = "X") %>% as.character()
-      DNA_libs[[i]]$HCDR3 <- splice_rabbit_HCDR3s(DNA_libs[[i]]$AA)
+      DNA_libs[[i]]$HCDR3 <- splice_rabbit_HCDR3s(DNA_libs[[i]]$AA, upstream_junction, downstream_junction)
       names(DNA_libs[[i]])[2] <- "counts"
       
       DNA_libs[[i]]$F_primer_template <- DNA_libs[[i]]$DNA %>% 
