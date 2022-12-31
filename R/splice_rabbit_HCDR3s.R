@@ -3,8 +3,8 @@
 #' Splices using amino acid regular expressions that recognize rabbit HCDR3 junctional sequences
 #'
 #' @param aa AA string set of translated sequences
-#' @param upstream_junction sequence REGEX upstream of rabbit HCDR3
-#' @param downstream_junction sequence REGEX downstream of rabbit HCDR3
+#' @param upstream_junction protein sequence REGEX upstream of rabbit HCDR3
+#' @param downstream_junction protein sequence REGEX downstream of rabbit HCDR3
 #' @export
 #'
 #' @example
