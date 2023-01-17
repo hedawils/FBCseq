@@ -1,4 +1,4 @@
-#' Calculate depmap score mean for depmap cell lines, and N per gene
+#' Differential HCDR3 analysis of rabbit Ab NGS outputs
 #'
 #' Function to conduct differential HCDR3 abundance analysis of single end MiSeq reads
 #' from FBCseq whole cell phage selections
@@ -9,6 +9,7 @@
 #' @param split_pattern DNA sequence used for sequence trimming and primer design. Forward primer hybridizes in FW4, reverse in HCDR3. Split point at protein sequence XXXXXXW^GPCTLVTVSS
 #' @param upstream_junction protein sequence REGEX upstream of rabbit HCDR3
 #' @param downstream_junction protein sequence REGEX downstream of rabbit HCDR3
+#' @param tail_pattern fixed sequence in FW4 of rabbit VH domains. sequences without this are removed
 #'
 #' @export
 #'
@@ -21,7 +22,8 @@
 
 differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files, 
                                primer = "GCCCTTGGTGGAGGC", split_pattern = "GGCCCAGG|GGCCAGGG", 
-                               upstream_junction = ".TYFC|A.YFC|AT.FC|ATY.C", downstream_junction = "WG.G"){
+                               upstream_junction = ".TYFC|A.YFC|AT.FC|ATY.C", downstream_junction = "WG.G", 
+                               tail_pattern = "VT.SS"){
   
   library(tidyverse)
   library(magrittr)
@@ -58,9 +60,9 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
     # trim DNA from 5' end such that translated sequence is in frame
     DNA <- substr(DNA, 1 + split_point %% 3, read_length)
     
-    
+    ### translate and extract HCDR3s
     aa <- Biostrings::translate(Biostrings::DNAStringSet(DNA), if.fuzzy.codon = "X")
-    HCDR3 <- extract_HCDR3s(aa, upstream_junction, downstream_junction)
+    HCDR3 <- extract_HCDR3s(aa, tail_pattern, upstream_junction, downstream_junction)
     HCDR3_libs[[i]] <- as.data.frame(table(HCDR3)) %>% 
       dplyr::mutate_at(vars(HCDR3), as.character)
     names(HCDR3_libs[[i]])[2] <- paste0("Count_", library_names[i]) %>% 
@@ -72,6 +74,8 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
     names(DNA_libs[[i]])[2] <- paste0("Count_", library_names[i]) %>% 
                                     stringr::str_remove_all(".fastq|.fastq.gz")
     
+    ### for one of each experimental and control, calculate primer templates
+    ### from DNA sequence
     if ((i == 1) | (i == length(experimental_fastq_files) + 1)) {
       DNA_libs[[i]]$AA <- Biostrings::DNAStringSet(DNA_libs[[i]]$DNA) %>% 
         Biostrings::translate(if.fuzzy.codon = "X") %>% as.character()
@@ -90,18 +94,20 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
     
   }
  
-  ### obtain control matrix - keep sequences common to either all experimental or control outputs
+  ### obtain control matrix - keep sequences common to either all experimental 
+  ### or all control outputs
   control_HCDR3s <- Reduce(intersect, HCDR3s[1:length(experimental_fastq_files)])
   experimental_HCDR3s <- Reduce(intersect, HCDR3s[(1+length(experimental_fastq_files)):length(HCDR3s)])
   
   unique_HCDR3s <- c(control_HCDR3s, experimental_HCDR3s) %>% unique
   unique_HCDR3s <- unique_HCDR3s[nchar(unique_HCDR3s) > 1]
   
-  ## filter down HCDR3_libs
+  ## filter down HCDR3_libs to only those unique HCDR3s
   for (i in 1:length(HCDR3_libs)){
     HCDR3_libs[[i]] <- HCDR3_libs[[i]][HCDR3_libs[[i]]$HCDR3 %in% unique_HCDR3s,]
   }
   
+  ## create count matrix
   matrix <- HCDR3_libs %>% purrr::reduce(dplyr::full_join, by = "HCDR3") 
   row.names(matrix) <- matrix$HCDR3
   matrix$HCDR3 <- NULL
@@ -151,22 +157,8 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
   
   results_ordered <- cbind(results_ordered, DNA_data)
   
-  #results_ordered$DNA_sequence <- DNA_data$DNA[match(results_ordered$HCDR3, DNA_data$HCDR3)]
-
-  #read_length_no_primer <- results_ordered$DNA_sequence %>% nchar %>% unique
   
-  ### forward primers start from second residue in FW4
-  #results_ordered$FW4_primer_template <- results_ordered$DNA_sequence %>% 
-  #  substr(read_length_no_primer-29,read_length_no_primer-11)
-  
-  ## reverse primer template to be trimmed to appropriate length after 
-  ## subsetting of sequences for mAb recovery
-  #results_ordered$primer_template <- results_ordered$DNA_sequence %>% 
-    # substr(1,read_length_no_primer-30) %>% 
-    # DNAStringSet %>% reverseComplement %>% as.character
-  
-  
-  return(results_ordered)
+  return(list(results_ordered, HCDR3_libs))
   
 }
 
