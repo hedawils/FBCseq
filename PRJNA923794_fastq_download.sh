@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/062/SRR23080962/SRR23080962.fastq.gz -o SRR23080962.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/063/SRR23080963/SRR23080963.fastq.gz -o SRR23080963.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/064/SRR23080964/SRR23080964.fastq.gz -o SRR23080964.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/065/SRR23080965/SRR23080965.fastq.gz -o SRR23080965.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/066/SRR23080966/SRR23080966.fastq.gz -o SRR23080966.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/067/SRR23080967/SRR23080967.fastq.gz -o SRR23080967.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/068/SRR23080968/SRR23080968.fastq.gz -o SRR23080968.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/069/SRR23080969/SRR23080969.fastq.gz -o SRR23080969.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/070/SRR23080970/SRR23080970.fastq.gz -o SRR23080970.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/071/SRR23080971/SRR23080971.fastq.gz -o SRR23080971.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/072/SRR23080972/SRR23080972.fastq.gz -o SRR23080972.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/073/SRR23080973/SRR23080973.fastq.gz -o SRR23080973.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/074/SRR23080974/SRR23080974.fastq.gz -o SRR23080974.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/075/SRR23080975/SRR23080975.fastq.gz -o SRR23080975.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/076/SRR23080976/SRR23080976.fastq.gz -o SRR23080976.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/077/SRR23080977/SRR23080977.fastq.gz -o SRR23080977.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/078/SRR23080978/SRR23080978.fastq.gz -o SRR23080978.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/079/SRR23080979/SRR23080979.fastq.gz -o SRR23080979.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/080/SRR23080980/SRR23080980.fastq.gz -o SRR23080980.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/081/SRR23080981/SRR23080981.fastq.gz -o SRR23080981.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR230/082/SRR23080982/SRR23080982.fastq.gz -o SRR23080982.fastq.gz

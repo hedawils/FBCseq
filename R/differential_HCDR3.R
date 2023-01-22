@@ -13,11 +13,8 @@
 #'
 #' @export
 #'
-#' @examples results <- differential_HCDR3(experimental_fastq_files = c(), control_fastq_files = c(), primer = "GCCCTTGGTGGAGGC")
-#' ### download example fastqs from ENA
-#' U266_results <- differential_HCDR3(c("314_4_1.fastq", "314_5_1.fastq", "314_6_1.fastq"), c("314_7_1.fastq", "314_8_1.fastq", "314_9_1.fastq"), primer = "GCCCTTGGTGGAGGC")
-#' H929_results <- differential_HCDR3(c("314_1_1.fastq", "314_2_1.fastq", "314_3_1.fastq"), c("314_7_1.fastq", "314_8_1.fastq", "314_9_1.fastq"), primer = "GCCCTTGGTGGAGGC")
-
+#' @examples H929_results <- differential_HCDR3(experimental_fastq_files = c("SRR23080982.fastq.gz", "SRR23080981.fastq.gz", "SRR23080980.fastq.gz"), control_fastq_files = c("SRR23080976.fastq.gz", "SRR23080975.fastq.gz", "SRR23080974.fastq.gz"), primer = "GCCCTTGGTGGAGGC")
+#' U266_results <- differential_HCDR3(experimental_fastq_files = c("SRR23080979.fastq.gz", "SRR23080978.fastq.gz", "SRR23080977.fastq.gz"), control_fastq_files = c("SRR23080976.fastq.gz", "SRR23080975.fastq.gz", "SRR23080974.fastq.gz"), primer = "GCCCTTGGTGGAGGC")
 
 
 differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files, 
@@ -32,6 +29,7 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
   library(ShortRead)
   library(Biostrings)
   library(DESeq2)
+  library(FBCseq)
   
   library_names <- c(experimental_fastq_files, control_fastq_files)
   

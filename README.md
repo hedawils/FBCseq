@@ -10,11 +10,11 @@ install_github("hedawils/FBCseq")
 
 Reads should span the HCDR3 in a reverse orientation, starting from CH1 or constant sequence immediately downstream of VH domain.  Package includes primer design capability for around-the-horn based recovery of single clones from mixed selection outputs via PCR.
 
-Published raw FASTQ files from publication can be downloaded from GEO under accession [GSE222897](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE222897).
+Published raw processed files from publication can be downloaded from GEO under accession [GSE222897](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE222897). Raw FASTQ can be accessed from SRA under project [PRJNA923794](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA923794&o=acc_s%3Aa).
 
-BASH script for downloading raw FASTQs via CURL from the SRA can be run as following:
+BASH script for downloading raw FASTQs from the ENA can be run as following (Linux or OSX):
 ```
-bash GSE222897_fastq_download.sh
+bash PRJNA923794_fastq_download.sh
 ```
 
 
@@ -25,7 +25,9 @@ Pipeline for differential HCDR3 analysis and primer design
 ```
 ## navigate to folder where files are located via setwd()
 
-## initiate differential abundance analysis
+## Differential HCDR3 abundance pipeline
+H929_results <- differential_HCDR3(experimental_fastq_files = c("SRR23080982.fastq.gz", "SRR23080981.fastq.gz", "SRR23080980.fastq.gz"), control_fastq_files = c("SRR23080976.fastq.gz", "SRR23080975.fastq.gz", "SRR23080974.fastq.gz"), primer = "GCCCTTGGTGGAGGC")
+
 H929_results <- differential_HCDR3(c("314_1_1.fastq", "314_2_1.fastq", "314_3_1.fastq"), c("314_7_1.fastq", "314_8_1.fastq", "314_9_1.fastq"), primer = "GCCCTTGGTGGAGGC")
 
 H929_df <- H929_results[[1]]
