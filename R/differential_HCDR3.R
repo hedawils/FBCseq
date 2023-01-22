@@ -37,11 +37,15 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
     stop("not all fastq files detected in directory. need to change directory or ensure input parameters are correct")
   }
   
+  
   HCDR3_libs <- list()
   DNA_libs <- list()
   HCDR3s <- list()
   
+
+  
   for (i in 1:length(library_names)){
+    cat(paste0("processing ",library_names[i],"\n"))
     DNA <- library_names[i] %>% readFastq %>% sread %>% reverseComplement
     
     if (i == 1){
@@ -92,6 +96,9 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
     
   }
  
+  
+  cat("Finding unique HCDR3s in experimental and control fastq files\n")
+  
   ### obtain control matrix - keep sequences common to either all experimental 
   ### or all control outputs
   control_HCDR3s <- Reduce(intersect, HCDR3s[1:length(experimental_fastq_files)])
@@ -104,7 +111,7 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
   for (i in 1:length(HCDR3_libs)){
     HCDR3_libs[[i]] <- HCDR3_libs[[i]][HCDR3_libs[[i]]$HCDR3 %in% unique_HCDR3s,]
   }
-  
+  cat("Running differential abundance analysis\n")
   ## create count matrix
   matrix <- HCDR3_libs %>% purrr::reduce(dplyr::full_join, by = "HCDR3") 
   row.names(matrix) <- matrix$HCDR3
@@ -155,6 +162,7 @@ differential_HCDR3 <- function(experimental_fastq_files, control_fastq_files,
   
   results_ordered <- cbind(results_ordered, DNA_data)
   
+  cat("Analysis complete\n")
   
   return(list(results_ordered, HCDR3_libs))
   
