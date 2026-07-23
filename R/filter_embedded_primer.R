@@ -3,9 +3,9 @@
 #' Identify reads containing correct reverse primer, filter them, then trim reads
 #' such that HCDR3 is in correct reading frame
 #'
-#' @param seq sequence
-#' @param read_length read length of single end read
+#' @param DNA sequence
 #' @param primer sequence of reverse primer
+#' @param read_length read length of single end read
 #' 
 #'
 #' @export

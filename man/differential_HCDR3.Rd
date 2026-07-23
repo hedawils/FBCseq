@@ -2,12 +2,16 @@
 % Please edit documentation in R/differential_HCDR3.R
 \name{differential_HCDR3}
 \alias{differential_HCDR3}
-\title{Calculate depmap score mean for depmap cell lines, and N per gene}
+\title{Differential HCDR3 analysis of rabbit Ab NGS outputs}
 \usage{
 differential_HCDR3(
   experimental_fastq_files,
   control_fastq_files,
-  primer = "GCCCTTGGTGGAGGC"
+  primer = "GCCCTTGGTGGAGGC",
+  split_pattern = "GGCCCAGG|GGCCAGGG",
+  upstream_junction = ".TYFC|A.YFC|AT.FC|ATY.C",
+  downstream_junction = "WG.G",
+  tail_pattern = "VT.SS"
 )
 }
 \arguments{
@@ -15,9 +19,21 @@ differential_HCDR3(
 
 \item{control_fastq_files}{vector of names of control fastq files for analysis. Ordered to be paired with experimental_fastq_files}
 
-\item{primer}{CH1 hybridizing reverse primer.}
+\item{primer}{CH1 hybridizing reverse primer used for NGS.}
+
+\item{split_pattern}{DNA sequence used for sequence trimming and primer design. Forward primer hybridizes in FW4, reverse in HCDR3. Split point at protein sequence XXXXXXW^GPCTLVTVSS}
+
+\item{upstream_junction}{protein sequence REGEX upstream of rabbit HCDR3}
+
+\item{downstream_junction}{protein sequence REGEX downstream of rabbit HCDR3}
+
+\item{tail_pattern}{fixed sequence in FW4 of rabbit VH domains. sequences without this are removed}
 }
 \description{
 Function to conduct differential HCDR3 abundance analysis of single end MiSeq reads
-from FBCseq experiment
+from FBCseq whole cell phage selections
+}
+\examples{
+H929_results <- differential_HCDR3(experimental_fastq_files = c("SRR23080982.fastq.gz", "SRR23080981.fastq.gz", "SRR23080980.fastq.gz"), control_fastq_files = c("SRR23080976.fastq.gz", "SRR23080975.fastq.gz", "SRR23080974.fastq.gz"), primer = "GCCCTTGGTGGAGGC")
+U266_results <- differential_HCDR3(experimental_fastq_files = c("SRR23080979.fastq.gz", "SRR23080978.fastq.gz", "SRR23080977.fastq.gz"), control_fastq_files = c("SRR23080976.fastq.gz", "SRR23080975.fastq.gz", "SRR23080974.fastq.gz"), primer = "GCCCTTGGTGGAGGC")
 }

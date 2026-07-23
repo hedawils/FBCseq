@@ -1,6 +1,6 @@
 #' Extract and clean rabbit HCDR3s
 #'
-#' Splices out HCDR3s, then filters HCDR3s that are in frame and do not havce stop codons.
+#' Splices out HCDR3s, then filters HCDR3s that are in frame and do not have stop codons.
 #'
 #' @param aa AA string set of translated sequences
 #' @param tail_pattern fixed sequence in FW4 of rabbit VH domains. sequences without this are removed

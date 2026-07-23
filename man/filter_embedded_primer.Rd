@@ -2,17 +2,18 @@
 % Please edit documentation in R/filter_embedded_primer.R
 \name{filter_embedded_primer}
 \alias{filter_embedded_primer}
-\title{Calculate depmap score mean for depmap cell lines, and N per gene}
+\title{Filter embedded CH1 primer from reads}
 \usage{
-filter_embedded_primer(DNA, primer)
+filter_embedded_primer(DNA, primer, read_length)
 }
 \arguments{
+\item{DNA}{sequence}
+
 \item{primer}{sequence of reverse primer}
 
-\item{seq}{sequence}
-
-\item{read_length}{Miseq read length - default = 250}
+\item{read_length}{read length of single end read}
 }
 \description{
-For a subset of cell lines
+Identify reads containing correct reverse primer, filter them, then trim reads
+such that HCDR3 is in correct reading frame
 }
